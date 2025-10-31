@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russian Oil Sanctions: Impact on India & China</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 90%;
+            max-height: 400px;
+        }
+    </style>
+    <!-- 
+    Color Palette Chosen: brilliant blues (#004AAD, #009FFD, #242223, #F0F6FB, #C0E6FF)
+    
+    Narrative Plan:
+    1. Hook: Start with the main headline: "U.S. Sanctions on Russian Oil."
+    2. Data Overview (Composition): Show who is buying Russian oil now (Donut Chart).
+    3. In-Depth Analysis (Dependency): Show how much this oil matters to India & China (Bar Chart).
+    4. The Core Problem (Flow): Visualize the "dilemma" they face (HTML/Tailwind Diagram).
+    5. Context (India's "Second Squeeze"): Show the trade pressure India is also under (Big Stat).
+    
+    Visualization Choices:
+    1. Russian Crude Exports: Goal=Compare Composition. Choice=Donut Chart (Chart.js). Justification=Clearly shows the dominant share of India/China. NO SVG.
+    2. Dependency on Russian Oil: Goal=Compare. Choice=Bar Chart (Chart.js). Justification=Directly compares the % of total imports for both nations. NO SVG.
+    3. The Sanction Dilemma: Goal=Organize Process. Choice=HTML/Tailwind Diagram. Justification=Visually explains the two bad choices. NO SVG/Mermaid JS.
+    4. India's Export Drop: Goal=Inform. Choice=Big Number. Justification=A single, powerful stat to show the secondary pressure. NO SVG.
+    
+    Confirmation: NO SVG graphics or Mermaid JS are used in this file. All charts are rendered on Canvas by Chart.js, and diagrams are built with HTML/Tailwind.
+    -->
+</head>
+<body class="bg-[#F0F6FB] text-[#242223]">
+
+    <div class="flex h-screen w-screen flex-col items-center justify-center p-6 md:p-12">
+        
+        <h1 class="mb-2 text-center text-3xl font-extrabold text-[#242223] md:text-5xl">
+            U.S. Sanctions on Russian Oil
+        </h1>
+        <p class="mb-6 text-center text-xl font-medium text-[#004AAD] md:text-2xl">
+            The Impact & Dilemma for India and China
+        </p>
+
+        <div class="grid h-[75vh] w-full max-w-7xl grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
+
+            <div class="flex flex-col rounded-xl bg-white p-4 shadow-lg md:p-6">
+                <h3 class="mb-2 text-center text-lg font-bold text-[#242223] md:text-xl">Russian Crude Oil Exports (Post-2022)</h3>
+                <div class="chart-container flex-grow">
+                    <canvas id="exportsChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="flex flex-col rounded-xl bg-white p-4 shadow-lg md:p-6">
+                <h3 class="mb-2 text-center text-lg font-bold text-[#242223] md:text-xl">Dependency on Russian Oil</h3>
+                <div class="chart-container flex-grow">
+                    <canvas id="dependencyChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="flex flex-col rounded-xl bg-white p-4 shadow-lg md:p-6">
+                <h3 class="mb-4 text-center text-lg font-bold text-[#242223] md:text-xl">The Sanction Dilemma</h3>
+                <div class="flex h-full w-full flex-col items-center justify-center">
+                    
+                    <div class="rounded-lg border-2 border-[#004AAD] bg-[#C0E6FF] p-3 text-center font-semibold">
+                        India & China rely on cheap Russian oil
+                    </div>
+                    
+                    <div class="my-2 text-3xl font-bold text-[#242223]">&#8595;</div>
+                    
+                    <div class="rounded-lg border-2 border-red-600 bg-red-100 p-3 text-center font-semibold text-red-800">
+                        New U.S. Sanctions on Rosneft & Lukoil
+                    </div>
+
+                    <div class="my-3 h-0.5 w-1/2 bg-gray-300"></div>
+
+                    <div class="flex w-full justify-around">
+                        <div class="flex w-2/5 flex-col items-center text-center">
+                            <h4 class="mb-2 font-bold text-red-700">PATH 1: Keep Buying</h4>
+                            <div class="rounded-lg border border-red-500 bg-red-50 p-3 text-sm">
+                                <strong>Risk:</strong> Cut off from U.S. Dollars & Global Financial System.
+                            </div>
+                        </div>
+                        
+                        <div class="flex w-2/5 flex-col items-center text-center">
+                            <h4 class="mb-2 font-bold text-blue-700">PATH 2: Stop Buying</h4>
+                            <div class="rounded-lg border border-blue-500 bg-blue-50 p-3 text-sm">
+                                <strong>Problem:</strong> Must buy expensive global oil. Risk of high inflation & slow economy.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="flex flex-col items-center justify-center rounded-xl bg-white p-4 shadow-lg md:p-6">
+                <h3 class="mb-4 text-center text-lg font-bold text-[#242223] md:text-xl">India's "Second Squeeze"</h3>
+                <div class="text-8xl font-extrabold text-red-600">-40%</div>
+                <p class="mt-4 text-center text-base font-medium text-[#242223]">
+                    Drop in India's exports to the U.S. (May-Sept) after 50% U.S. tariffs.
+                </p>
+                <p class="mt-2 text-center text-sm text-gray-600">
+                    This adds pressure on India to comply with the new oil sanctions.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        window.onload = function () {
+            
+            const exportsCtx = document.getElementById('exportsChart');
+            if (exportsCtx) {
+                new Chart(exportsCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['China', 'India', 'Rest of World'],
+                        datasets: [{
+                            label: 'Russian Crude Exports',
+                            data: [47, 38, 15],
+                            backgroundColor: [
+                                '#004AAD', 
+                                '#009FFD', 
+                                '#C0E6FF'   
+                            ],
+                            borderColor: '#F0F6FB',
+                            borderWidth: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    font: {
+                                        size: 14,
+                                        weight: 'bold'
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: function(tooltipItems) {
+                                        const item = tooltipItems[0];
+                                        let label = item.chart.data.labels[item.dataIndex];
+                                        if (Array.isArray(label)) {
+                                          return label.join(' ');
+                                        } else {
+                                          return label;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            const dependencyCtx = document.getElementById('dependencyChart');
+            if (dependencyCtx) {
+                new Chart(dependencyCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: [
+                            ['India (supplies 1/3', 'of total demand)'], 
+                            ['China (supplies 1/5', 'of total demand)']
+                        ],
+                        datasets: [{
+                            label: 'Russian Oil as % of Total Demand/Imports',
+                            data: [33.3, 20],
+                            backgroundColor: [
+                                '#009FFD', 
+                                '#004AAD'  
+                            ],
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Percent (%)',
+                                    font: {
+                                        size: 14,
+                                        weight: 'bold'
+                                    }
+                                }
+                            },
+                            y: {
+                                ticks: {
+                                    font: {
+                                        size: 14,
+                                        weight: 'bold'
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: function(tooltipItems) {
+                                        const item = tooltipItems[0];
+                                        let label = item.chart.data.labels[item.dataIndex];
+                                        if (Array.isArray(label)) {
+                                          return label.join(' ');
+                                        } else {
+                                          return label;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        };
+    </script>
+</body>
+</html>
