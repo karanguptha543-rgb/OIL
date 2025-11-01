@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russian Oil Sanctions: Impact on India & China</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            /* Overflow is now on the parent panel */
+        }
+
+        /* This is the key fix: Ensures canvas is clickable */
+        .chart-container canvas {
+            position: relative;
+            z-index: 1; /* Puts canvas on top of the flag overlay */
+        }
+
+        /* Styles for the blurred flag overlay */
+        .flag-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            filter: blur(0px); /* Apply blur */
+            opacity: 0.15; /* Made it even brighter (less opaque) */
+            transition: opacity 0.5s ease-in-out;
+            z-index: 0; /* Sits behind the canvas */
+        }
+        
+        /* Styles for active and inactive tabs */
+        .tab-btn.active {
+            background-color: #004AAD;
+            color: white;
+        }
+        .tab-btn.inactive {
+            background-color: transparent;
+            color: #004AAD;
+        }
+        .tab-btn.inactive:hover {
+            background-color: #EBF8FF; /* A very light blue */
+        }
+        
+        /* Style for shared importers */
+        .shared-importer {
+            color: #004AAD;
+            font-weight: 700;
+        }
+
+    </style>
+    <!-- 
+    Color Palette Chosen: brilliant blues (#004AAD, #009FFD, #242223, #F0F6FB, #C0E6FF)
+    
+    Narrative Plan:
+    1. Hook: Start with the main headline: "U.S. Sanctions on Russian Oil."
+    2. Data Overview (Composition): Show who is buying Russian oil now (Donut Chart) with interactive flag backgrounds.
+    3. In-Depth Analysis (Dependency): Show how much this oil matters to India & China (Bar Chart).
+    4. The Core Problem (Flow): Visualize the "dilemma" they face (HTML/Tailwind Diagram).
+    5. Context (India's "Second Squeeze"): Show the trade pressure India is also under (Big Stat) + WSJ Source Link.
+    6. NEW: Refined Product Exports: Show who buys refined products from India/China (Interactive Tabbed List).
+    
+    Visualization Choices:
+    1. Russian Crude Exports: Goal=Compare Composition. Choice=Donut Chart (Chart.js) with interactive blurred flag backgrounds *within its container*. NO SVG.
+    2. Dependency on Russian Oil: Goal=Compare. Choice=Bar Chart (Chart.js). Justification=Directly compares the % of total imports for both nations. NO SVG.
+    3. The Sanction Dilemma: Goal=Organize Process. Choice=HTML/Tailwind Diagram. Justification=Visually explains the two bad choices. NO SVG/Mermaid JS.
+    4. India's Export Drop: Goal=Inform. Choice=Big Number + Source Link. Justification=A single stat with its source. NO SVG.
+    5. NEW: Refined Buyers: Goal=Organize/Compare Lists. Choice=HTML/Tailwind/JS Tabs. Justification=Interactive way to present the new list data. NO SVG.
+    
+    Confirmation: NO SVG graphics or Mermaid JS are used in this file. All charts are rendered on Canvas by Chart.js, and diagrams/lists are built with HTML/Tailwind.
+    --></head>
+<body class="bg-[#F0F6FB] text-[#242223]">
+
+    <div class="flex min-h-screen w-screen flex-col items-center p-6 pt-12 md:p-12">
+        
+        <h1 class="mb-2 text-center text-3xl font-extrabold text-[#242223] md:text-5xl">
+            U.S. Sanctions on Russian Oil
+        </h1>
+        <p class="mb-6 text-center text-xl font-medium text-[#004AAD] md:text-2xl">
+            The Impact & Dilemma for India and China
+        </p>
+
+        <div class="grid w-full max-w-7xl grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
+
+            <!-- This is the panel that was changed --><div class="flex flex-col rounded-xl bg-white shadow-lg relative overflow-hidden">
+                <h3 class="mb-2 text-center text-lg font-bold text-[#242223] md:text-xl pt-4 md:pt-6 px-4 md:px-6">Russian Crude Oil Exports (Post-2022)</h3>
+                <div class="chart-container px-4 md:px-6" id="exportsChartContainer"> <!-- Added ID for easier targeting --><canvas id="exportsChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="flex flex-col rounded-xl bg-white p-4 shadow-lg md:p-6">
+                <h3 class="mb-2 text-center text-lg font-bold text-[#242223] md:text-xl">Dependency on Russian Oil</h3>
+                <div class="chart-container">
+                    <canvas id="dependencyChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="flex flex-col rounded-xl bg-white p-4 shadow-lg md:p-6">
+                <h3 class="mb-4 text-center text-lg font-bold text-[#242223] md:text-xl">The Sanction Dilemma</h3>
+                <div class="flex h-full w-full flex-col items-center justify-center py-6">
+                    
+                    <div class="rounded-lg border-2 border-[#004AAD] bg-[#C0E6FF] p-3 text-center font-semibold">
+                        India & China rely on cheap Russian oil
+                    </div>
+                    
+                    <div class="my-2 text-3xl font-bold text-[#242223]">&#8595;</div>
+                    
+                    <div class="rounded-lg border-2 border-red-600 bg-red-100 p-3 text-center font-semibold text-red-800">
+                        New U.S. Sanctions on Rosneft & Lukoil
+                    </div>
+
+                    <div class="my-3 h-0.5 w-1/2 bg-gray-300"></div>
+
+                    <div class="flex w-full justify-around">
+                        <div class="flex w-2/5 flex-col items-center text-center">
+                            <h4 class="mb-2 font-bold text-red-700">PATH 1: Keep Buying</h4>
+                            <div class="rounded-lg border border-red-500 bg-red-50 p-3 text-sm">
+                                <strong>Risk:</strong> Cut off from U.S. Dollars & Global Financial System.
+                            </div>
+                        </div>
+                        
+                        <div class="flex w-2/5 flex-col items-center text-center">
+                            <h4 class="mb-2 font-bold text-blue-700">PATH 2: Stop Buying</h4>
+                            <div class="rounded-lg border border-blue-500 bg-blue-50 p-3 text-sm">
+                                <strong>Problem:</strong> Must buy expensive global oil. Risk of high inflation & slow economy.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="flex flex-col items-center justify-center rounded-xl bg-white p-4 shadow-lg md:p-6">
+                <h3 class="mb-4 text-center text-lg font-bold text-[#242223] md:text-xl">India's "Second Squeeze"</h3>
+                <div class="text-8xl font-extrabold text-red-600">-40%</div>
+                <p class="mt-4 text-center text-base font-medium text-[#242223]">
+                    Drop in India's exports to the U.S. (May-Sept) after 50% U.S. tariffs.
+                </p>
+                <p class="mt-2 text-center text-sm text-gray-600">
+                    This adds pressure on India to comply with the new oil sanctions.
+                </p>
+
+                <div class="mt-5 w-full border-t pt-4 text-center text-xs text-gray-500">
+                    Read more at:
+                </div>
+                <a href="https://www.wsj.com/world/asia/india-china-trump-russia-sanctions-e4ba5b59" target="_blank" rel="noopener noreferrer" class="mt-2 block transition-opacity hover:opacity-70">
+                    <img src="wsj.png" alt="The Wall Street Journal" class="h-8 w-auto">
+                </a>
+            </div>
+        </div>
+
+        <div class="mt-6 w-full max-w-7xl rounded-xl bg-white p-4 shadow-lg md:mt-8 md:p-6">
+            <h3 class="mb-2 text-center text-lg font-bold text-[#242223] md:text-xl">Who Buys the Refined Products?</h3>
+            <p class="mb-4 text-center text-sm text-gray-600">Key importers of refined petroleum from India and China.</p>
+            
+            <div class="flex w-full justify-center space-x-2 rounded-lg bg-gray-100 p-1 md:space-x-4">
+                <button id="btn-india" class="tab-btn flex-1 rounded-lg px-4 py-2 font-semibold transition md:flex-none">
+                    🌎 Buyers from India
+                </button>
+                <button id="btn-china" class="tab-btn flex-1 rounded-lg px-4 py-2 font-semibold transition md:flex-none">
+                    🌎 Buyers from China
+                </button>
+            </div>
+
+            <div class="pt-4">
+                <div id="list-india">
+                    <ul class="grid grid-cols-2 gap-x-4 gap-y-2 md:grid-cols-3 lg:grid-cols-4">
+                        <li class="flex items-center rounded-lg bg-gray-50 p-2"><span class="ml-2 shared-importer">Singapore</span></li>
+                        <li class="flex items-center rounded-lg bg-gray-50 p-2"><span class="ml-2">United States</span></li>
+                        <li class="flex items-center rounded-lg bg-gray-50 p-2"><span class="ml-2 shared-importer">Netherlands</span></li>
+                        <li class="flex items-center rounded-lg bg-gray-50 p-2"><span class="ml-2">South Africa</span></li>
+                        <li class="flex items-center rounded-lg bg-gray-50 p-2"><span class="ml-2">United Arab Emirates (UAE)</span></li>
+                        <li class="flex items-center rounded-lg bg-gray-50 p-2"><span class="ml-2">France</span></li>
+                        <li class="flex items-center rounded-lg bg-gray-50 p-2"><span class="ml-2">Italy</span></li>
+                        <li class="flex items-center rounded-lg bg-gray-50 p-2"><span class="ml-2">Germany</span></li>
+                        <li class="flex items-center rounded-lg bg-gray-50 p-2"><span class="ml-2">Croatia</span></li>
+                        <li class="flex items-center rounded-lg bg-gray-50 p-2"><span class="ml-2">Latvia</span></li>
+                        <li class="flex items-center rounded-lg bg-gray-50 p-2"><span class="ml-2">Romania</span></li>
+                    </ul>
+                </div>
+                <div id="list-china" class="hidden">
+                     <ul class="grid grid-cols-2 gap-x-4 gap-y-2 md:grid-cols-3 lg:grid-cols-4">
+                        <li class="flex items-center rounded-lg bg-gray-50 p-2"><span class="ml-2">Hong Kong</span></li>
+                        <li class="flex items-center rounded-lg bg-gray-50 p-2"><span class="ml-2 shared-importer">Singapore</span></li>
+                        <li class="flex items-center rounded-lg bg-gray-50 p-2"><span class="ml-2">Philippines</span></li>
+                        <li class="flex items-center rounded-lg bg-gray-50 p-2"><span class="ml-2">Australia</span></li>
+                        <li class="flex items-center rounded-lg bg-gray-50 p-2"><span class="ml-2">Malaysia</span></li>
+                        <li class="flex items-center rounded-lg bg-gray-50 p-2"><span class="ml-2">Liberia</span></li>
+                        <li class="flex items-center rounded-lg bg-gray-50 p-2"><span class="ml-2">Panama</span></li>
+                        <li class="flex items-center rounded-lg bg-gray-50 p-2"><span class="ml-2 shared-importer">Netherlands</span></li>
+                    </ul>
+                </div>
+                 <p class="mt-4 text-center text-xs text-gray-500">
+                    *Countries in <strong class="shared-importer">blue text</strong> import from both nations.
+                 </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function () {
+            // Flag image URLs - CORRECTED
+            const chinaFlag = 'china.jpg'; // Correct: red flag with stars
+            const indiaFlag = 'india.jpg'; // Correct: tricolor flag with chakra
+            const worldMap = 'word.jpg'; // Added world map image
+            let activeFlagElement = null; // To keep track of the currently active flag overlay element
+
+            const exportsChartPanel = document.querySelector('.flex-col.rounded-xl.bg-white.shadow-lg.relative.overflow-hidden');
+
+            function setBlurredBackgroundInContainer(flagUrl) {
+                // Clear any existing flag first
+                clearBackgroundInContainer();
+
+                const flagOverlay = document.createElement('div');
+                flagOverlay.classList.add('flag-overlay');
+                flagOverlay.style.backgroundImage = `url('${flagUrl}')`;
+                exportsChartPanel.prepend(flagOverlay); // Add as the first child of the panel
+                activeFlagElement = flagOverlay;
+            }
+
+            function clearBackgroundInContainer() {
+                if (activeFlagElement) {
+                    activeFlagElement.remove();
+                    activeFlagElement = null;
+                }
+            }
+
+            // --- Chart 1: Exports Donut Chart ---
+            const exportsCtx = document.getElementById('exportsChart');
+            if (exportsCtx) {
+                const exportsChart = new Chart(exportsCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['China', 'India', 'Rest of World'],
+                        datasets: [{
+                            label: 'Russian Crude Exports',
+                            data: [47, 38, 15],
+                            backgroundColor: [
+                                '#004AAD', 
+                                '#009FFD', 
+                                '#C0E6FF'  
+                            ],
+                            borderColor: '#F0F6FB',
+                            borderWidth: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    font: {
+                                        size: 14,
+                                        weight: 'bold'
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: function(tooltipItems) {
+                                        const item = tooltipItems[0];
+                                        let label = item.chart.data.labels[item.dataIndex];
+                                        if (Array.isArray(label)) {
+                                            return label.join(' ');
+                                        } else {
+                                            return label;
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        onClick: (event, elements) => {
+                            if (elements.length > 0) {
+                                const clickedElementIndex = elements[0].index;
+                                const label = exportsChart.data.labels[clickedElementIndex];
+
+                                // Set flag/map based on clicked segment
+                                if (label === 'China') {
+                                    setBlurredBackgroundInContainer(chinaFlag);
+                                } else if (label === 'India') {
+                                    setBlurredBackgroundInContainer(indiaFlag);
+                                } else if (label === 'Rest of World') {
+                                    setBlurredBackgroundInContainer(worldMap); // Show world map
+                                } else {
+                                    clearBackgroundInContainer(); // Clear if clicking outside any segment or unrecognized
+                                }
+                            } else {
+                                clearBackgroundInContainer(); // Clear if clicking outside any segment
+                            }
+                        }
+                    }
+                });
+            }
+
+            // --- Chart 2: Dependency Bar Chart ---
+            const dependencyCtx = document.getElementById('dependencyChart');
+            if (dependencyCtx) {
+                new Chart(dependencyCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: [
+                            ['India (supplies 1/3', 'of total demand)'], 
+                            ['China (supplies 1/5', 'of total demand)']
+                        ],
+                        datasets: [{
+                            label: 'Russian Oil as % of Total Demand/Imports',
+                            data: [33.3, 20],
+                            backgroundColor: [
+                                '#009FFD', 
+                                '#004AAD' 
+                            ],
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Percent (%)',
+                                    font: {
+                                        size: 14,
+                                        weight: 'bold'
+                                    }
+                                }
+                            },
+                            y: {
+                                ticks: {
+                                    font: {
+                                        size: 14,
+                                        weight: 'bold'
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: function(tooltipItems) {
+                                        const item = tooltipItems[0];
+                                        let label = item.chart.data.labels[item.dataIndex];
+                                        if (Array.isArray(label)) {
+                                            return label.join(' ');
+                                        } else {
+                                            return label;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // --- Tabbed List Logic ---
+            const btnIndia = document.getElementById('btn-india');
+            const btnChina = document.getElementById('btn-china');
+            const listIndia = document.getElementById('list-india');
+            const listChina = document.getElementById('list-china');
+
+            function showTab(tabName) {
+                if (tabName === 'india') {
+                    listIndia.classList.remove('hidden');
+                    listChina.classList.add('hidden');
+                    
+                    btnIndia.classList.add('active');
+                    btnIndia.classList.remove('inactive');
+                    btnChina.classList.add('inactive');
+                    btnChina.classList.remove('active');
+                } else if (tabName === 'china') {
+                    listChina.classList.remove('hidden');
+                    listIndia.classList.add('hidden');
+                    
+                    btnChina.classList.add('active');
+                    btnChina.classList.remove('inactive');
+                    btnIndia.classList.add('inactive');
+                    btnIndia.classList.remove('active');
+                }
+            }
+
+            if (btnIndia && btnChina && listIndia && listChina) {
+                btnIndia.addEventListener('click', () => showTab('india'));
+                btnChina.addEventListener('click', () => showTab('china'));
+
+                showTab('india');
+            }
+        };
+    </script>
+</body>
+</html>
+
